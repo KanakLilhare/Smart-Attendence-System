@@ -215,23 +215,22 @@ Attendance Marked
 
 ## 📸 Screenshots
 
-Add screenshots of:
+### 🏠 Home Page
 
-- Home Page
-- Student Registration
-- Face Capture Window
-- Attendance Dashboard
-- Attendance Reports
+![Home Page](screenshots/home.png)
 
-Example:
+### 👨‍🎓 Student Registration
 
-```text
-screenshots/
-├── home.png
-├── registration.png
-├── attendance.png
-└── reports.png
-```
+![Student Registration](screenshots/registration.png)
+
+### 📋 Attendance Dashboard
+
+![Attendance Dashboard](screenshots/attendance.png)
+
+### 📊 Attendance Reports
+
+![Attendance Reports](screenshots/reports.png)
+
 
 ---
 
