@@ -242,39 +242,6 @@ flask_sqlalchemy
 tabulate
 ```
 
----
-
-## 🤝 Contributing
-
-Contributions are welcome.
-
-1. Fork the repository
-
-```bash
-git fork
-```
-
-2. Create a feature branch
-
-```bash
-git checkout -b feature-name
-```
-
-3. Commit changes
-
-```bash
-git commit -m "Added new feature"
-```
-
-4. Push branch
-
-```bash
-git push origin feature-name
-```
-
-5. Open a Pull Request
-
----
 
 ## 📄 License
 
