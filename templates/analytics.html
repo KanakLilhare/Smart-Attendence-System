@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Analytics — Smart Attendance System</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg,#eef2ff,#e0f2fe);
+      margin: 0; padding: 0; color: #1e293b;
+    }
+    .topbar {
+      padding: 18px 28px; background: linear-gradient(90deg,#3b82f6,#2563eb); color: white;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .container {
+      max-width: 1100px; margin: 24px auto; padding: 20px;
+      background: #fff; border-radius: 12px; box-shadow: 0 6px 24px rgba(2,6,23,.08);
+    }
+    .row { display:flex; gap:18px; flex-wrap:wrap; }
+    .card {
+      background:#fff; border-radius:10px; padding:14px; box-shadow:0 4px 12px rgba(2,6,23,.04);
+    }
+    .summary-cards { display:flex; gap:12px; margin-bottom:18px; flex-wrap:wrap; }
+    .summary { flex:1; min-width:160px; padding:14px; border-radius:10px; background:linear-gradient(135deg,#f0f9ff,#ecfeff); }
+    .summary h3 { margin:0; color:#0f172a; }
+    .summary p { margin:6px 0 0; color:#475569; font-weight:600; }
+
+    .chart-card { flex: 1 1 48%; min-height:320px; padding:16px; }
+    .chart-full { width:100%; min-height:420px; padding:16px; }
+
+    .heatmap { width:100%; padding:10px; }
+    .small-note { color:#64748b; font-size:0.9rem; margin-top:8px; }
+
+    a.nav-btn { color:white; text-decoration:none; padding:10px 14px; background:#0ea5b1; border-radius:8px; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div style="font-weight:700; font-size:18px;">Smart Attendance System — Analytics</div>
+    <div>
+      <a class="nav-btn" href="/dashboard">Dashboard</a>
+      <a class="nav-btn" href="/view_records" style="margin-left:10px;">Records</a>
+      <a class="nav-btn" href="/logout" style="margin-left:10px;background:#ef4444;">Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+      <div class="summary card">
+        <h3 id="total-students">--</h3>
+        <p>Total Students</p>
+      </div>
+      <div class="summary card">
+        <h3 id="total-lectures">--</h3>
+        <p>Total Lectures</p>
+      </div>
+      <div class="summary card">
+        <h3 id="total-records">--</h3>
+        <p>Total Attendance Records</p>
+      </div>
+      <div class="summary card">
+        <h3 id="avg-att">--</h3>
+        <p>Average Attendance / Lecture</p>
+      </div>
+    </div>
+
+    <!-- Row 1 Charts -->
+    <div class="row">
+      <div class="card chart-card">
+        <h4>Monthly Attendance Trend (Last 12 months)</h4>
+        <canvas id="monthlyChart"></canvas>
+      </div>
+
+      <div class="card chart-card">
+        <h4>Student-wise Attendance (Top students)</h4>
+        <canvas id="studentChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Row 2 Charts -->
+    <div class="row" style="margin-top:18px;">
+      <div class="card chart-full">
+        <h4>Lecture-wise Attendance Distribution</h4>
+        <canvas id="lectureChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Row 3: Daily heatmap-like (bar) -->
+    <div class="row" style="margin-top:18px;">
+      <div class="card chart-full">
+        <h4>Daily Attendance (Last 30 days)</h4>
+        <canvas id="dailyChart"></canvas>
+        <p class="small-note">Note: Heatmap-style visualization simplified as daily bar chart for clarity.</p>
+      </div>
+    </div>
+
+    <div style="text-align:center; margin-top:16px;">
+      <a href="/download_csv" class="nav-btn" style="background:#16a34a;">Download Full CSV</a>
+    </div>
+  </div>
+
+  <script>
+    // helper for fetch + JSON
+    async function getJSON(path) {
+      const r = await fetch(path);
+      if (!r.ok) { console.error('API error', path); return null; }
+      return r.json();
+    }
+
+    // load summary
+    async function loadSummary() {
+      const d = await getJSON('/api/analytics/summary');
+      if (!d) return;
+      document.getElementById('total-students').innerText = d.total_students;
+      document.getElementById('total-lectures').innerText = d.total_lectures;
+      document.getElementById('total-records').innerText = d.total_records;
+      document.getElementById('avg-att').innerText = d.avg_attendance;
+    }
+
+    // monthly chart
+    async function loadMonthly() {
+      const d = await getJSON('/api/analytics/monthly');
+      if (!d) return;
+      const ctx = document.getElementById('monthlyChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: d.months,
+          datasets: [{
+            label: 'Attendance Count',
+            data: d.counts,
+            fill: true,
+            tension: 0.3,
+            backgroundColor: 'rgba(37,99,235,0.12)',
+            borderColor: 'rgba(37,99,235,1)',
+            pointBackgroundColor: 'rgba(37,99,235,1)'
+          }]
+        },
+        options: { responsive:true, plugins:{legend:{display:false}} }
+      });
+    }
+
+    // student bar
+    async function loadStudents() {
+      const d = await getJSON('/api/analytics/student');
+      if (!d) return;
+      const ctx = document.getElementById('studentChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: { labels:d.labels, datasets:[{label:'Present Count', data:d.data, backgroundColor:'rgba(16,185,129,0.8)'}] },
+        options: { responsive:true, indexAxis:'y', plugins:{legend:{display:false}}, scales:{x:{beginAtZero:true}} }
+      });
+    }
+
+    // lecture pie
+    async function loadLecture() {
+      const d = await getJSON('/api/analytics/lecture');
+      if (!d) return;
+      const ctx = document.getElementById('lectureChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'pie',
+        data: { labels:d.labels, datasets:[{data:d.data, backgroundColor:[
+            '#2563eb','#f97316','#ef4444','#16a34a','#a78bfa','#f59e0b','#06b6d4','#f43f5e'
+        ]}]},
+        options:{responsive:true}
+      });
+    }
+
+    // daily chart (last 30 days)
+    async function loadDaily() {
+      const d = await getJSON('/api/analytics/daily');
+      if (!d) return;
+      const ctx = document.getElementById('dailyChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: { labels:d.dates, datasets:[{label:'Daily Present', data:d.counts, backgroundColor:'rgba(59,130,246,0.7)'}] },
+        options: { responsive:true, plugins:{legend:{display:false}}, scales:{x:{ticks:{maxRotation:90,minRotation:45}}} }
+      });
+    }
+
+    // initialize
+    (async function init() {
+      await loadSummary();
+      await loadMonthly();
+      await loadStudents();
+      await loadLecture();
+      await loadDaily();
+    })();
+
+  </script>
+
+</body>
+</html>

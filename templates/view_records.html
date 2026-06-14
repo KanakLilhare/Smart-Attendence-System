@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Attendance Records | Smart Attendance System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #eef2ff, #e0f2fe);
+      margin: 0;
+      padding: 0;
+      color: #1e293b;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 50px auto;
+      background: #fff;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 25px;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 15px;
+    }
+
+    .header h2 {
+      color: #2563eb;
+      font-size: 2rem;
+      margin: 0;
+    }
+
+    .header p {
+      color: #6b7280;
+      margin-top: 5px;
+    }
+
+    .nav-links {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .nav-links a {
+      background: #2563eb;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      background: #1e3a8a;
+    }
+
+    .filter-form {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 25px;
+    }
+
+    .filter-input {
+      padding: 8px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      color: #1e293b;
+      background: #f8fafc;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      margin-top: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th {
+      background: #2563eb;
+      color: white;
+      padding: 14px 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+    }
+
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 0.95rem;
+    }
+
+    tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    tr:hover {
+      background: #dbeafe;
+    }
+
+    .download-btn {
+      display: inline-block;
+      margin-top: 20px;
+      background: #10b981;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+
+    .download-btn:hover {
+      background: #059669;
+    }
+
+    .total {
+      text-align: center;
+      font-weight: 600;
+      color: #2563eb;
+      margin-top: 20px;
+      font-size: 1.1rem;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <h2 style="text-align:center; color:#2563eb;">Smart Attendance System</h2>
+    <div class="nav-links">
+      <a href="/dashboard">🏠 Dashboard</a>
+      <a href="/add_student">➕ Add Student</a>
+      <a href="/logout">🚪 Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <h2>📋 Attendance Records</h2>
+      <p>Filter and download attendance by lecture or date.</p>
+    </div>
+
+    <!-- Filter Form -->
+    <form method="POST" class="filter-form">
+      <select name="lecture" class="filter-input">
+        <option value="">📘 Select Lecture</option>
+        {% for lec in lectures %}
+          <option value="{{ lec }}" {% if lecture_filter == lec %}selected{% endif %}>{{ lec }}</option>
+        {% endfor %}
+      </select>
+
+      <input type="date" name="date" value="{{ date_filter or '' }}" class="filter-input" />
+
+      <button type="submit" class="download-btn" style="background:#2563eb;">🔍 Filter</button>
+      <a href="/view_records" class="download-btn" style="background:#9ca3af;">Reset</a>
+
+      {% if lecture_filter or date_filter %}
+        <a href="/download_csv?lecture={{ lecture_filter }}&date={{ date_filter }}" class="download-btn">⬇️ Download CSV</a>
+      {% else %}
+        <a href="/download_csv" class="download-btn">⬇️ Download CSV</a>
+      {% endif %}
+    </form>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% if records %}
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Student Name</th>
+            <th>Lecture</th>
+            <th>Date</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for record in records %}
+          <tr>
+            <td>{{ record.user_id }}</td>
+            <td>{{ record.name }}</td>
+            <td>{{ record.lecture }}</td>
+            <td>{{ record.date }}</td>
+            <td>{{ record.timestamp }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="total">
+      ✅ {{ total_records }} record(s) found{% if lecture_filter %} for <b>{{ lecture_filter }}</b>{% endif %}{% if date_filter %} on <b>{{ date_filter }}</b>{% endif %}.
+    </div>
+
+    {% else %}
+      <p style="text-align:center; color:#6b7280; font-weight:500;">No attendance records found.</p>
+    {% endif %}
+  </div>
+
+  <footer>
+    © 2025 Smart Attendance System | Developed by <b>Kanak 💙</b>
+  </footer>
+
+</body>
+</html>

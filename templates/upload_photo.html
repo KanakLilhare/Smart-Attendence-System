@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Photo Attendance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container" style="max-width:600px;margin:50px auto;background:white;padding:30px;border-radius:12px;box-shadow:0 0 20px rgba(0,0,0,0.1);">
+    <h2 style="text-align:center;color:#2563eb;margin-bottom:20px;">📤 Upload Group Photo</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+
+        <label>Lecture Name</label>
+        <input type="text" required name="lecture_name" class="input">
+
+        <label>Select Photo</label>
+        <input type="file" required name="photo" class="input">
+
+        <button type="submit" class="btn">Upload & Mark Attendance</button>
+
+    </form>
+
+    <br>
+    <a href="/dashboard" class="btn-secondary">Back to Dashboard</a>
+</div>
+
+</body>
+</html>

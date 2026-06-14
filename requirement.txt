@@ -1,0 +1,9 @@
+opencv-python==4.12.0.88
+opencv-contrib-python==4.12.0.88
+numpy
+pillow
+flask
+flask_sqlalchemy
+tabulate
+
+

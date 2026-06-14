@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard | Smart Attendance System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .dashboard-container {
+      max-width: 1100px;
+      margin: 50px auto;
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    .dashboard-header {
+      text-align: center;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 15px;
+      margin-bottom: 30px;
+    }
+
+    .dashboard-header h2 {
+      font-size: 2rem;
+      color: #2563eb;
+      margin-bottom: 5px;
+    }
+
+    .dashboard-header p {
+      color: #6b7280;
+      font-size: 1rem;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 25px;
+      margin-top: 30px;
+    }
+
+    .card {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      border-radius: 15px;
+      padding: 25px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+    }
+
+    .green {
+      background: linear-gradient(135deg, #10b981, #059669);
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+
+    .orange {
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+    }
+
+    .purple {
+      background: linear-gradient(135deg, #7c3aed, #5b21b6);
+      box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+    }
+
+    .card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      font-size: 1rem;
+      color: #f9fafb;
+    }
+
+    .logout {
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .logout a {
+      background: #ef4444;
+      color: white;
+      padding: 12px 30px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background 0.3s ease-in-out;
+    }
+
+    .logout a:hover {
+      background: #b91c1c;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #6b7280;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <h2>Smart Attendance System</h2>
+    <div class="nav-links">
+      <a href="/add_student">➕ Add Student</a>
+      <a href="/view_records">📋 View Attendance</a>
+      <a href="/logout">🚪 Logout</a>
+    </div>
+  </div>
+
+  <div class="dashboard-container">
+    <div class="dashboard-header">
+      <h2>Welcome, {{ teacher_name }} 👩‍🏫</h2>
+      <p>Manage attendance, students, and lectures efficiently.</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert {{ category }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="cards">
+
+      <!-- Add Student -->
+      <div class="card green">
+        <h3>➕ Add New Student</h3>
+        <p>Capture and register student faces for recognition.</p>
+        <a href="/add_student" style="background:#fff;color:#065f46;padding:10px 15px;border-radius:6px;text-decoration:none;font-weight:600;">Add Student</a>
+      </div>
+
+      <!-- Start Attendance -->
+      <div class="card">
+        <h3>📸 Start Attendance</h3>
+        <p>Recognize faces and mark attendance automatically.</p>
+        <form method="POST" action="/start_attendance">
+          <input type="text" name="lecture_name" placeholder="Enter Lecture Name" required style="margin-top:10px;padding:8px;border:none;border-radius:6px;width:80%;">
+          <button type="submit" style="background:#fff;color:#1e3a8a;padding:8px 15px;border-radius:6px;border:none;font-weight:600;margin-top:10px;cursor:pointer;">
+            Start
+          </button>
+        </form>
+      </div>
+
+      <!-- View Records -->
+      <div class="card orange">
+        <h3>📄 View Attendance</h3>
+        <p>Check and download attendance records instantly.</p>
+        <a href="/view_records" style="background:#fff;color:#92400e;padding:10px 15px;border-radius:6px;text-decoration:none;font-weight:600;">View Records</a>
+      </div>
+
+      <!-- Analytics -->
+      <div class="card purple">
+        <h3>📊 Attendance Analytics</h3>
+        <p>Monthly charts and insights for better tracking.</p>
+        <a href="/analytics" style="background:#fff;color:#5b21b6;padding:10px 15px;border-radius:6px;text-decoration:none;font-weight:600;">View Analytics</a>
+      </div>
+
+    </div>
+
+    <div class="logout">
+      <a href="/logout">Logout</a>
+    </div>
+  </div>
+
+  <footer>
+    © 2025 Smart Attendance System | Developed by Kanak 💙
+  </footer>
+
+</body>
+</html>
