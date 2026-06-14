@@ -219,13 +219,13 @@ Attendance Marked
 
 ![Home Page](screenshots/home.png)
 
-### 👨‍🎓 Student Registration
+### 👨‍🎓 Teacher Registration
 
 ![Registration](screenshots/registration.png)
 
 ### 📊 Attendance Reports
 
-![Attendance Reports](screenshots/reports.png)
+![Attendance Reports](screenshots/attendence.png)
 
 
 ---
