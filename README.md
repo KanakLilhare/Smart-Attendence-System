@@ -221,11 +221,7 @@ Attendance Marked
 
 ### 👨‍🎓 Student Registration
 
-![Student Registration](screenshots/registration.png)
-
-### 📋 Attendance Dashboard
-
-![Attendance Dashboard](screenshots/attendance.png)
+![Registration](screenshots/registration.png)
 
 ### 📊 Attendance Reports
 
