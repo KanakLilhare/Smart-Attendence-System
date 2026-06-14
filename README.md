@@ -293,7 +293,7 @@ This project is licensed under the MIT License.
 
 Data Science & AI Enthusiast
 
-GitHub: https://github.com/yourusername
+GitHub: https://github.com/KanakLilhare
 
 ---
 
